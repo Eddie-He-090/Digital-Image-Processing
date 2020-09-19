@@ -1,0 +1,252 @@
+
+%实验五 图像分割与图像特征描述
+
+%1.基于阈值法的图像分割和边缘检测
+%(1)查看图像的直方图，确定合适的阈值进行图像分割
+clear all;
+clc;
+I = imread('rice3.png');
+imshow(I,[]);title('原图')
+figure,imhist(I,256);title('原图的直方图')
+T=125;
+level=T/255;
+BW1=im2bw(I,level);
+figure,imshow(BW1,[]);title('阈值法的图像分割')
+T,
+
+%(2)采用最大类间方差阈值法进行图像分割
+clear all;
+clc;
+I = imread('rice3.png');
+imshow(I,[]);title('原图')
+figure,imhist(I,256);title('原图的直方图')
+level = graythresh(I);  %取最大类间方差阈值
+BW1=im2bw(I,level);     %图像二值化
+figure,imshow(BW1,[]);title('最大类间方差阈值法的图像分割')
+T=level*255;
+T,
+
+%(3)迭代法确定阈值法进行图像分割
+
+clear all;
+clc;
+I = imread('rice3.png');
+imshow(I,[]);title('原图')
+figure,imhist(I,256);title('原图的直方图')
+T1=0.5*(double(min(I(:)))+double(max(I(:))));
+done=false;
+while ~done
+    g=I>=T1;
+    T2=0.5*(mean(I(g))+mean(I(~g)));   %迭代法确定阈值法
+    done=abs(T1-T2)<0.5;
+    T1=T2;
+   end
+level=T1/255;
+BW1=im2bw(I,level);
+figure,imshow(BW1,[]);title('迭代法确定阈值的图像分割')
+T1,
+
+%(4)比较prewitt算子与canny的边缘检测效果
+clear all;
+clc;
+I = imread('circuit1.tif');
+BW1 = edge(I,'prewitt');
+BW2 = edge(I,'canny');
+imshow(I);title('原图')
+figure,imshow(BW1);title('prewitt边缘检测')
+figure, imshow(BW2);title('canny边缘检测')
+
+
+%(5)比较sobel算子与canny的边缘检测效果
+clear all;
+clc;
+I = imread('circuit1.tif');
+BW1 = edge(I,'sobel');
+BW2 = edge(I,'canny');
+imshow(I);title('原图')
+figure,imshow(BW1);title('sobel边缘检测')
+figure, imshow(BW2);title('canny边缘检测')
+
+%(6)比较LOG算子与canny的边缘检测效果
+clear all;
+clc;
+I = imread('circuit1.tif');
+BW1 = edge(I,'log');
+BW2 = edge(I,'canny');
+imshow(I);title('原图')
+figure,imshow(BW1);title('log边缘检测')
+figure, imshow(BW2);title('canny边缘检测')
+
+%2.不变矩的形状特征描述
+%(1)提取形状的不变矩特征,比较原目标与目标旋转后的形状特征。
+clear all;
+clc;
+H=imread('horse1.gif');
+imshow(H,[ ]);
+F1=invmoments(H);
+J=imrotate(H,90);
+F2=invmoments(J);
+K=imrotate(H,180);
+F3=invmoments(K);
+F1,
+F2,
+F3,
+
+%(2)目标缩小，比较原目标与目标缩小后的形状特征。
+clear all;
+clc;
+I=imread('horse1.gif');
+H=imresize(I,0.5);
+J=imresize(I,0.25);
+imshow(H,[ ]);
+F1=invmoments(I);
+F2=invmoments(H);
+F3=invmoments(J);
+F1,
+F2,
+F3,
+
+
+%(3)目标缩小并旋转，比较原目标与目标缩小和旋转后的形状特征。
+clear all;
+clc;
+I=imread('horse1.gif');
+H=imresize(I,0.25);
+imshow(H,[ ]);
+F1=invmoments(I);
+J=imrotate(H,90);
+F2=invmoments(J);
+K=imrotate(H,180);
+F3=invmoments(K);
+F1,
+F2,
+F3,
+
+
+%(4)目标左右翻转，比较原目标与目标左右翻转后的形状特征。
+clear all;
+clc;
+I=imread('horse1.gif');
+H=fliplr(I);
+imshow(H,[ ]);
+F1=invmoments(I);
+F2=invmoments(H);
+F1,
+F2,
+
+%(5)目标左右翻转并缩小，比较原目标与目标左右翻转并缩小后的形状特征。
+clear all;
+clc;
+I=imread('horse1.gif');
+H1=fliplr(I);
+H=imresize(H1,0.5);
+imshow(H,[ ]);
+F1=invmoments(I);
+F2=invmoments(H);
+F1,
+F2,
+
+%(6)目标上下翻转，比较原目标与目标上下翻转后的形状特征。
+clear all;
+clc;
+I=imread('horse1.gif');
+H=flipud(I);
+imshow(H,[ ]);
+F1=invmoments(I);
+F2=invmoments(H);
+F1,
+F2,
+
+%3.基于频谱法的纹理图像特征描述  
+%对具有不同的周期和方向的纹理图像，显示其频谱信息，
+%通过功率谱的径向和角向的分布特征分析纹理图像的周期和方向
+ 
+%(1)纹理图像1的频谱法特征描述
+ clear all;
+ clc;
+ close all;
+ f1=imread('texture1.tif');
+ [srad1,sang1,s1]=specxture(f1);             %计算图像的频谱，s(r),s(a)
+imshow(f1);title('纹理图像1');
+figure,imshow(s1,[]);title('纹理图像1的频谱');
+figure,plot(srad1); title('纹理图像1的s(r)曲线');
+figure,plot(sang1); title('纹理图像1的s(a)曲线');
+
+
+%(2)纹理图像2的频谱法特征描述
+ clear all;
+ clc;
+ close all;
+ f1=imread('texture2.gif');
+ [srad1,sang1,s1]=specxture(f1);             %计算图像的频谱，s(r),s(a)
+
+imshow(f1);title('纹理图像2');
+figure,imshow(s1,[]);title('纹理图像2的频谱');
+figure,plot(srad1); title('纹理图像2的s(r)曲线');
+figure,plot(sang1); title('纹理图像2的s(a)曲线');
+
+
+  %(3)纹理图像3的频谱法特征描述
+ clear all;
+ clc;
+ close all;
+ f1=imread('texture3.gif');
+ [srad1,sang1,s1]=specxture(f1);              %计算图像的频谱，s(r),s(a)
+
+imshow(f1);title('纹理图像3');
+figure,imshow(s1,[]);title('纹理图像3的频谱');
+figure,plot(srad1); title('纹理图像3的s(r)曲线');
+figure,plot(sang1); title('纹理图像3的s(a)曲线');
+
+
+%(4)周期相同,方向不同，纹理图像的频谱法特征描述
+ clear all;
+ clc;
+ close all;
+ f1=imread('texture4.bmp');
+ f2=imread('texture5.bmp');
+ [srad1,sang1,s1]=specxture(f1);             %计算图像的频谱，s(r),s(a)
+ [srad2,sang2,s2]=specxture(f2); 
+ 
+subplot(2,1,1),imshow(f1);title('纹理图像4');
+subplot(2,1,2),imshow(f2);title('纹理图像5');
+figure,subplot(2,1,1),plot(srad1); title('纹理图像4的s(r)曲线');
+subplot(2,1,2),plot(srad2); title('纹理图像5的s(r)曲线')
+figure,subplot(2,1,1),plot(sang1); title('纹理图像4的s(a)曲线');
+subplot(2,1,2),plot(sang2); title('纹理图像5的s(a)曲线');
+
+
+%(5)周期不同，方向相同,纹理图像的频谱法特征描述
+ clear all;
+ clc;
+ close all;
+ f1=imread('texture5.bmp');
+ f2=imread('texture6.bmp');
+ [srad1,sang1,s1]=specxture(f1);             %计算图像的频谱，s(r),s(a)
+ [srad2,sang2,s2]=specxture(f2); 
+ 
+subplot(2,1,1),imshow(f1);title('纹理图像5');
+subplot(2,1,2),imshow(f2);title('纹理图像6');
+figure,subplot(2,1,1),plot(srad1); title('纹理图像5的s(r)曲线');
+subplot(2,1,2),plot(srad2); title('纹理图像6的s(r)曲线')
+figure,subplot(2,1,1),plot(sang1); title('纹理图像5的s(a)曲线');
+subplot(2,1,2),plot(sang2); title('纹理图像6的s(a)曲线');
+
+
+
+%(6)周期不同，方向不同,纹理图像的频谱法特征描述
+ clear all;
+ clc;
+ close all;
+ f1=imread('texture4.bmp');
+ f2=imread('texture6.bmp');
+ [srad1,sang1,s1]=specxture(f1);             %计算图像的频谱，s(r),s(a)
+ [srad2,sang2,s2]=specxture(f2); 
+ 
+subplot(2,1,1),imshow(f1);title('纹理图像4');
+subplot(2,1,2),imshow(f2);title('纹理图像6');
+figure,subplot(2,1,1),plot(srad1); title('纹理图像4的s(r)曲线');
+subplot(2,1,2),plot(srad2); title('纹理图像6的s(r)曲线')
+figure,subplot(2,1,1),plot(sang1); title('纹理图像4的s(a)曲线');
+subplot(2,1,2),plot(sang2); title('纹理图像6的s(a)曲线');
+
